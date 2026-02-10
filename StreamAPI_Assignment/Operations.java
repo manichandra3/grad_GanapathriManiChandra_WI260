@@ -15,7 +15,6 @@ public class Operations {
         ); 
 
         // 1. Highest salary paid employee
-        // FIX: Changed .isPresent() to .ifPresent()
         employees.stream()
                  .max(Comparator.comparingDouble(Employee::getSalary))
                  .ifPresent(e -> System.out.println("Highest Salary: " + e.getName()));
@@ -26,7 +25,6 @@ public class Operations {
         System.out.println("Gender Count: " + genderCount);
 
         // 3. Total expense Dept wise
-        // FIX: Corrected typo .collec() to .collect()
         Map<Department, Double> totalExpenseByDept = employees.stream()
                  .collect(Collectors.groupingBy(
                       Employee::getDepartment,
@@ -55,7 +53,7 @@ public class Operations {
         System.out.println("Salaries updated (excluding managers).");
 
         // 7. Total number of employees
-        long totalEmployees = employees.stream().count();
+        long totalEmployees = employees.size();
         System.out.println("Total Employees: " + totalEmployees);
     }
 }
