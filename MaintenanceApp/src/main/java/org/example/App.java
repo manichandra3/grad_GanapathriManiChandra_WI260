@@ -11,7 +11,6 @@ import java.util.Scanner;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.and;
 
-// --- ENUMS FOR DATA INTEGRITY ---
 enum SiteType {
     VILLA, OPEN_SITE, INDEPENDENT_HOUSE, APARTMENT;
 
@@ -71,7 +70,6 @@ public class App {
         }
     }
 
-    // --- HELPER: CRASH PREVENTION FOR INPUT ---
     private static int readInt(String prompt) {
         while (true) {
             System.out.print(prompt);
