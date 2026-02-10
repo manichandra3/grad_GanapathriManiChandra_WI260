@@ -2,22 +2,40 @@ package org.example;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.DeleteResult;
-import com.mongodb.internal.bulk.DeleteRequest;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
-import javax.print.Doc;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Filters.and;
 
-enum TYPE{
-    VILLA1,
-    OPEN_SITE,
-    INDEPENDENT_HOUSE,
+// --- ENUMS FOR DATA INTEGRITY ---
+enum SiteType {
+    VILLA, OPEN_SITE, INDEPENDENT_HOUSE, APARTMENT;
 
+    public static SiteType fromString(String val) {
+        try {
+            return SiteType.valueOf(val.toUpperCase().replace(" ", "_"));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
 }
+
+enum SiteStatus {
+    OPEN, OCCUPIED;
+
+    public static SiteStatus fromString(String val) {
+        try {
+            return SiteStatus.valueOf(val.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+}
+
 public class App {
     private static Document currentUser = null;
     private static final Scanner scanner = new Scanner(System.in);
@@ -33,9 +51,7 @@ public class App {
 
             while (true) {
                 printMenu();
-                System.out.print("Enter Option: ");
-                int option = scanner.hasNextInt() ? scanner.nextInt() : 5;
-                if (scanner.hasNextLine()) scanner.nextLine();
+                int option = readInt("Enter Option: ");
 
                 switch (option) {
                     case 0 -> handleLogin(usersCol);
@@ -51,7 +67,31 @@ public class App {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println("Critical System Error: " + e.getMessage());
+        }
+    }
+
+    // --- HELPER: CRASH PREVENTION FOR INPUT ---
+    private static int readInt(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            try {
+                int val = Integer.parseInt(scanner.nextLine());
+                return val;
+            } catch (NumberFormatException e) {
+                System.out.println(">>> Error: Please enter a valid number.");
+            }
+        }
+    }
+
+    private static String readEnumInput(String prompt, Object[] values) {
+        while (true) {
+            System.out.print(prompt + " " + Arrays.toString(values) + ": ");
+            String input = scanner.nextLine().toUpperCase().replace(" ", "_");
+            for (Object v : values) {
+                if (v.toString().equals(input)) return input;
+            }
+            System.out.println(">>> Invalid choice. Please pick from the list.");
         }
     }
 
@@ -82,23 +122,25 @@ public class App {
         if (!isLoggedIn()) return;
 
         if (isAdmin()) {
-            System.out.println("1. View Pending Payments\n2. Generate Monthly Bills (Admin)");
-            int choice = scanner.nextInt(); scanner.nextLine();
+            System.out.println("1. View Pending Payments\n2. Generate Monthly Bills");
+            int choice = readInt("Choice: ");
             if (choice == 1) {
                 for (Document m : maintCol.find(eq("status", "PENDING"))) {
-                    System.out.println("Record ID: " + m.getObjectId("_id") + " | Amount: ₹" + m.getInteger("amount") + " | Owner: " + m.getObjectId("ownerId"));
+                    System.out.println("ID: " + m.getObjectId("_id") + " | Amount: ₹" + m.getInteger("amount") + " | OwnerID: " + m.getObjectId("ownerId"));
                 }
             } else {
-
                 for (Document s : sitesCol.find()) {
-                    int rate = s.getString("status").equalsIgnoreCase("Open") ? 6 : 9;
+                    if (s.getObjectId("currentOwnerId") == null) continue; // Skip sites without owners
+
+                    int rate = SiteStatus.OPEN.name().equals(s.getString("status")) ? 6 : 9;
                     int amount = s.getInteger("sqft") * rate;
+                    
                     maintCol.insertOne(new Document("ownerId", s.getObjectId("currentOwnerId"))
                             .append("siteId", s.getObjectId("_id"))
                             .append("amount", amount)
                             .append("status", "PENDING"));
                 }
-                System.out.println(">>> Monthly bills generated successfully.");
+                System.out.println(">>> Monthly bills generated.");
             }
         } else {
             System.out.println("--- Your Unpaid Bills ---");
@@ -117,121 +159,89 @@ public class App {
 
         if (isAdmin()) {
             for (Document r : reqCol.find(eq("status", "PENDING"))) {
-                System.out.println("Request from Owner " + r.getObjectId("requesterId") + " for Site " + r.getObjectId("siteId"));
+                System.out.println("Request for Site ID: " + r.getObjectId("siteId"));
                 System.out.print("Approve (a) or Reject (r)? ");
                 String action = scanner.nextLine();
                 if (action.equalsIgnoreCase("a")) {
-                    reqCol.updateOne(eq("_id", r.getObjectId("_id")), Updates.set("status", "APPROVED"));
                     Document data = (Document) r.get("proposedData");
                     sitesCol.updateOne(eq("_id", r.getObjectId("siteId")),
                             Updates.combine(Updates.set("status", data.getString("status")), Updates.set("type", data.getString("type"))));
+                    reqCol.updateOne(eq("_id", r.getObjectId("_id")), Updates.set("status", "APPROVED"));
                     System.out.println(">>> Approved.");
                 } else {
                     reqCol.updateOne(eq("_id", r.getObjectId("_id")), Updates.set("status", "REJECTED"));
                 }
             }
         } else {
-            System.out.print("Enter Site Number to request change: ");
-            int sNum = scanner.nextInt(); scanner.nextLine();
+            int sNum = readInt("Enter Site Number for change: ");
             Document site = sitesCol.find(and(eq("siteNumber", sNum), eq("currentOwnerId", currentUser.getObjectId("_id")))).first();
             if (site != null) {
-                System.out.print("Enter New Status (Open/Occupied): ");
-                String stat = scanner.nextLine();
-                System.out.print("Enter New Type (Villa/Apartment/Independent House/Open Site): ");
-                String type = scanner.nextLine();
+                String stat = readEnumInput("New Status", SiteStatus.values());
+                String type = readEnumInput("New Type", SiteType.values());
+
                 reqCol.insertOne(new Document("requesterId", currentUser.getObjectId("_id"))
                         .append("siteId", site.getObjectId("_id"))
                         .append("status", "PENDING")
                         .append("proposedData", new Document("status", stat).append("type", type)));
-                System.out.println(">>> Request Sent to Admin.");
+                System.out.println(">>> Request Sent.");
             }
         }
     }
 
-    private static void manageUsersAndSites(MongoCollection<Document> usersCol, MongoCollection<Document> sitesCol, MongoCollection<Document> maintenanceCol, MongoCollection<Document> requestCol) {
+    private static void manageUsersAndSites(MongoCollection<Document> usersCol, MongoCollection<Document> sitesCol, MongoCollection<Document> maintCol, MongoCollection<Document> reqCol) {
         if (!isAdmin()) return;
-        System.out.println("\n--- ADMIN TOOLS ---");
-        System.out.println("1. Add New Owner");
-        System.out.println("2. Add New Site");
-        System.out.println("3. Update Site Details");
-        System.out.println("4. Delete Site");
-        System.out.println("5. Back");
-
-        System.out.print("Enter Choice: ");
-        int choice = scanner.nextInt(); scanner.nextLine();
+        System.out.println("\n1. Add Owner | 2. Add Site | 3. Update Site | 4. Delete Site");
+        int choice = readInt("Choice: ");
 
         switch (choice) {
-            case 1 -> { // ADD NEW OWNER
+            case 1 -> {
                 System.out.print("Name: "); String n = scanner.nextLine();
                 System.out.print("Email: "); String e = scanner.nextLine();
                 usersCol.insertOne(new Document("name", n).append("email", e).append("role", "OWNER"));
-                System.out.println(">>> Owner Added successfully.");
             }
-            case 2 -> { // ADD NEW SITE
-                System.out.print("Site Number (int): "); int sn = scanner.nextInt(); scanner.nextLine();
-                System.out.print("Dimension (e.g., 30x40): "); String dim = scanner.nextLine();
-                System.out.print("Total Sqft: "); int sqft = scanner.nextInt(); scanner.nextLine();
-                System.out.print("Type (Villa/Open Site): "); String type = scanner.nextLine();
-                System.out.print("Status (Open/Occupied): "); String status = scanner.nextLine();
+            case 2 -> {
+                int sn = readInt("Site Number: ");
+                System.out.print("Dimension: "); String dim = scanner.nextLine();
+                int sqft = readInt("Total Sqft: ");
+                String type = readEnumInput("Type", SiteType.values());
+                String status = readEnumInput("Status", SiteStatus.values());
 
-                System.out.print("Owner Email (or leave blank for none): ");
-                String ownerEmail = scanner.nextLine();
-                Object ownerId = null;
-
-                if (!ownerEmail.isEmpty()) {
-                    Document owner = usersCol.find(eq("email", ownerEmail)).first();
-                    if (owner != null) {
-                        ownerId = owner.getObjectId("_id");
-                    } else {
-                        System.out.println(">>> Owner not found. Creating site without owner.");
-                    }
+                System.out.print("Owner Email (or blank): ");
+                String oEmail = scanner.nextLine();
+                ObjectId oId = null;
+                if (!oEmail.isEmpty()) {
+                    Document owner = usersCol.find(eq("email", oEmail)).first();
+                    if (owner != null) oId = owner.getObjectId("_id");
                 }
 
-                Document newSite = new Document("siteNumber", sn)
-                        .append("dimension", dim)
-                        .append("sqft", sqft)
-                        .append("type", type)
-                        .append("status", status)
-                        .append("currentOwnerId", ownerId);
-
-                sitesCol.insertOne(newSite);
-                System.out.println(">>> Site #" + sn + " added successfully.");
+                sitesCol.insertOne(new Document("siteNumber", sn).append("dimension", dim)
+                        .append("sqft", sqft).append("type", type).append("status", status).append("currentOwnerId", oId));
+                System.out.println(">>> Site added.");
             }
-            case 3 -> { // UPDATE SITE
-                System.out.print("Site Number: "); int sn = scanner.nextInt(); scanner.nextLine();
-                System.out.print("New Dimension: "); String dim = scanner.nextLine();
-                sitesCol.updateOne(eq("siteNumber", sn), Updates.set("dimension", dim));
-                System.out.println(">>> Site Updated.");
-            }
-            case 4 -> { // DELETE SITE
-                System.out.print("Enter Site Number to Delete: ");
-                int sn = scanner.nextInt(); scanner.nextLine();
+            case 4 -> {
+                int sn = readInt("Site Number to Delete: ");
                 Document site = sitesCol.find(eq("siteNumber", sn)).first();
                 if (site != null) {
-                    Object siteId = site.getObjectId("_id");
-                    sitesCol.deleteOne(eq("siteNumber", sn));
-                    // TODO: Cleanup hanging refs after deleting site
-                    maintenanceCol.deleteMany(eq("_id", siteId));
-                    requestCol.deleteMany(eq("_id",siteId));
-                    System.out.println(">>> Successfully Deleted Site #" + sn);
-
-                } else {
-                    System.out.println(">>> Site not found!");
+                    ObjectId id = site.getObjectId("_id");
+                    sitesCol.deleteOne(eq("_id", id));
+                    maintCol.deleteMany(eq("siteId", id)); // Clean up references
+                    reqCol.deleteMany(eq("siteId", id));
+                    System.out.println(">>> Site and related records deleted.");
                 }
             }
-            default -> System.out.println("Returning to menu...");
         }
     }
+
     private static void printMenu() {
         System.out.println("\n--- LAYOUT MAINTENANCE SYSTEM ---");
         if (currentUser == null) {
             System.out.println("0. Login | 5. Exit");
         } else {
-            System.out.print("User: " + currentUser.getString("name") + "\nOptions: ");
-            System.out.println("\n0. Switch User \n1. Dashboard \n2. Maintenance \n3. Requests" + (isAdmin() ? " \n4. Admin Tools" : "") + " \n5. Exit");
+            System.out.println("User: " + currentUser.getString("name") + " (" + currentUser.getString("role") + ")");
+            System.out.println("0. Switch User | 1. Dashboard | 2. Maintenance | 3. Requests" + (isAdmin() ? " | 4. Admin Tools" : "") + " | 5. Exit");
         }
     }
 
     private static boolean isLoggedIn() { return currentUser != null; }
-    private static boolean isAdmin() { return currentUser != null && "ADMIN".equals(currentUser.getString("role")); }
+    private static boolean isAdmin() { return isLoggedIn() && "ADMIN".equals(currentUser.getString("role")); }
 }
