@@ -1,1 +1,0 @@
-public record RaceResult(String bikeName, long durationMs, int topSpeed) {}
