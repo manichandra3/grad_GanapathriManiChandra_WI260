@@ -9,9 +9,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableJpaRepositories(basePackages = "org.example.springmvc_student.repositories.sql")
 @EnableMongoRepositories(basePackages = "org.example.springmvc_student.repositories.nosql")
 public class SpringMvcStudentApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(SpringMvcStudentApplication.class, args);
     }
-
 }

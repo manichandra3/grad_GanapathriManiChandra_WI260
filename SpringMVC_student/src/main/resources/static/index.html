@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spring MVC Student Application</title>
+</head>
+<body>
+    <h1>Student Management</h1>
+    
+    <div id="studentForm">
+        <div class="form-group">
+            <label for="rollNo">Roll Number</label>
+            <input type="number" id="rollNo" name="rollNo" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="standard">Standard (Grade)</label>
+            <input type="number" id="standard" name="standard" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="school">School</label>
+            <input type="text" id="school" name="school" required>
+        </div>
+
+        <div class="buttons">
+            <button onclick="insertStudent()">Insert Student</button>
+            <button onclick="resetData()" style="background-color: #dc3545; color: white; border: none;">Reset All Data</button>
+        </div>
+    </div>
+
+    <div id="feedback" style="display: none;"></div>
+
+    <script>
+        const API_BASE = '/students';
+
+        async function insertStudent() {
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'none';
+            feedback.className = '';
+            feedback.textContent = '';
+
+            const student = {
+                rollNo: document.getElementById('rollNo').value,
+                name: document.getElementById('name').value,
+                standard: document.getElementById('standard').value,
+                school: document.getElementById('school').value
+            };
+
+            // Basic client-side validation
+            if (!student.rollNo || !student.name || !student.standard || !student.school) {
+                showFeedback('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Convert types
+            student.rollNo = parseInt(student.rollNo);
+            student.standard = parseInt(student.standard);
+
+            try {
+                const response = await fetch(`${API_BASE}/insert`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(student)
+                });
+
+                if (response.ok) {
+                    const savedStudent = await response.json();
+                    showFeedback(`Student inserted successfully: ${savedStudent.name} (Roll No: ${savedStudent.rollNo})`, 'success');
+                    // Clear form
+                    document.getElementById('rollNo').value = '';
+                    document.getElementById('name').value = '';
+                    document.getElementById('standard').value = '';
+                    document.getElementById('school').value = '';
+                } else {
+                    const errorText = await response.text();
+                    showFeedback(`Error inserting student: ${errorText || response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showFeedback(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function resetData() {
+            if (!confirm('Are you sure you want to delete ALL data?')) {
+                return;
+            }
+
+            const feedback = document.getElementById('feedback');
+            feedback.style.display = 'none';
+
+            try {
+                const response = await fetch(`${API_BASE}/reset`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    const message = await response.text();
+                    showFeedback(message, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showFeedback(`Error resetting data: ${errorText || response.statusText}`, 'error');
+                }
+            } catch (error) {
+                showFeedback(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            feedback.textContent = message;
+            feedback.className = type;
+            feedback.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
