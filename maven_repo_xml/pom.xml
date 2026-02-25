@@ -1,0 +1,8 @@
+<!-- Source: https://mvnrepository.com/artifact/io.github.manichandra3/assignment-jar -->
+<dependency>
+    <groupId>io.github.manichandra3</groupId>
+    <artifactId>assignment-jar</artifactId>
+    <version>1.0.0</version>
+    <scope>compile</scope>
+</dependency>
+
