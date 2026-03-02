@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Calculator</title>
+</head>
+<body>
+
+    <h2><u>LOAN CALCULATOR</u></h2>
+    
+    <form id="loanForm">
+        <p>
+            <label for="applicant">Applicant: </label>
+            <input type="text" id="applicant" name="applicant" required minlength="2" placeholder="Enter name">
+        </p>
+        
+        <p>
+            <label>Type: </label>
+            <label><input type="radio" name="loanType" value="home" required> HOME</label> /
+            <label><input type="radio" name="loanType" value="car"> CAR</label> /
+            <label><input type="radio" name="loanType" value="personal"> PERSONAL</label>
+        </p>
+        
+        <p>
+            <label>Interest: </label>
+            <label><input type="radio" name="interest" value="9" required> 9%</label> &nbsp;
+            <label><input type="radio" name="interest" value="12"> 12%</label> &nbsp;
+            <label><input type="radio" name="interest" value="15"> 15%</label>
+        </p>
+        
+        <p>
+            <label for="amount">Amount: </label>
+            <input type="number" id="amount" name="amount" min="10000" max="5000000" required placeholder="Amount in Rs">
+            <small><i>(&lt; 5 L, &lt; 1 L, &lt; 10K min.)</i></small>
+        </p>
+        
+        <p>
+            <label for="duration">Duration: </label>
+            <input type="number" id="duration" name="duration" min="1" max="30" required placeholder="Years">
+            <small><i>(&gt; 30 Y, &gt; 7 Y, &gt; 5 Y max.)</i></small>
+        </p>
+        
+        <p>
+            <label>EMI : </label>
+            <output id="emiResult" name="emiResult">0.00</output>
+        </p>
+        
+        <button type="submit">CALCULATE EMI</button>
+    </form>
+
+    <script>
+        document.getElementById('loanForm').addEventListener('submit', function(event) {
+            event.preventDefault();             
+            const amount = Number(document.getElementById('amount').value);
+            const durationYears = Number(document.getElementById('duration').value);
+            const interestRate = Number(document.querySelector('input[name="interest"]:checked').value);
+            
+            const r = interestRate / 12 / 100; // Monthly interest rate
+            const n = durationYears * 12; // Total duration in months
+            
+            // EMI Formula: P x R x (1+R)^N / ((1+R)^N - 1)
+            const emi = (amount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+            
+            document.getElementById('emiResult').value = emi.toFixed(2);
+        });
+    </script>
+</body>
+</html>
