@@ -1,0 +1,85 @@
+.strength-query {
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+
+  .query-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .description {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+  }
+
+  .query-form {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+
+      label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.4rem;
+      }
+
+      select, input {
+        padding: 0.6rem 0.8rem;
+        border: 2px solid #dce1e6;
+        border-radius: 6px;
+        font-size: 0.95rem;
+
+        &:focus {
+          outline: none;
+          border-color: #3498db;
+        }
+      }
+    }
+  }
+
+  .result-display {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ecf0f1;
+  }
+
+  .strength-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background: #eaf4fc;
+    border-radius: 8px;
+
+    .label {
+      font-size: 0.9rem;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .value {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #2980b9;
+      margin: 0.5rem 0;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: #34495e;
+    }
+  }
+}

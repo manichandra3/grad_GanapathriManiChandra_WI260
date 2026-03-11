@@ -1,0 +1,54 @@
+<div class="student-detail">
+  <div class="page-header">
+    <h2>Student Details</h2>
+    <a routerLink="/students" class="btn btn-secondary">← Back to List</a>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading student details...</div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div *ngIf="student" class="detail-card">
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Registration Number</label>
+        <span>{{ student.registrationNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Roll Number</label>
+        <span>{{ student.rollNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Name</label>
+        <span>{{ student.name }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Standard</label>
+        <span>{{ student.standard }}</span>
+      </div>
+      <div class="detail-item">
+        <label>School</label>
+        <span>{{ student.school }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Gender</label>
+        <span>{{ student.gender }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Percentage</label>
+        <span>{{ student.percentage }}%</span>
+      </div>
+      <div class="detail-item">
+        <label>Result</label>
+        <span class="status-badge" [class.pass]="student.percentage >= 40" [class.fail]="student.percentage < 40">
+          {{ getPassStatus(student.percentage) }}
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <a [routerLink]="['/students/edit', student.registrationNumber]" class="btn btn-warning">Edit Student</a>
+      <button (click)="deleteStudent()" class="btn btn-danger">Delete Student</button>
+    </div>
+  </div>
+</div>

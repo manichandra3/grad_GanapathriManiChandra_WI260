@@ -11,7 +11,7 @@ import com.student.api.models.Student;
 public interface StudentService {
     ResponseEntity<List<Student>> getAllStudents();
     ResponseEntity<String> addStudent(Student student);
-    ResponseEntity<Optional<Student>> getStudent(int registrationNumber);
+    ResponseEntity<Student> getStudent(int registrationNumber);
     ResponseEntity<String> updateStudent(int registrationNumber, Student student);
     ResponseEntity<String> patchStudent(int registrationNumber, Map<String, Object> updates);
     ResponseEntity<String> deleteStudent(int registrationNumber);

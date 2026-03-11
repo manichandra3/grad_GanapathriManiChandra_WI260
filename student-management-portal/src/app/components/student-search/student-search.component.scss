@@ -1,0 +1,118 @@
+.student-search {
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    input {
+      flex: 1;
+      max-width: 400px;
+      padding: 0.6rem 0.8rem;
+      border: 2px solid #dce1e6;
+      border-radius: 6px;
+      font-size: 1rem;
+
+      &:focus {
+        outline: none;
+        border-color: #3498db;
+      }
+    }
+  }
+
+  .result-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      margin-top: 0;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .detail-item {
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.2rem;
+    }
+
+    span {
+      font-size: 1rem;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+  }
+
+  .action-bar {
+    display: flex;
+    gap: 0.8rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ecf0f1;
+  }
+
+  .patch-form {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ecf0f1;
+
+    h4 {
+      margin-top: 0;
+      color: #2c3e50;
+    }
+
+    .hint {
+      font-size: 0.85rem;
+      color: #7f8c8d;
+      margin-bottom: 1rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.3rem;
+      }
+
+      input, select {
+        padding: 0.5rem 0.7rem;
+        border: 2px solid #dce1e6;
+        border-radius: 6px;
+        font-size: 0.9rem;
+
+        &:focus {
+          outline: none;
+          border-color: #3498db;
+        }
+      }
+    }
+  }
+}

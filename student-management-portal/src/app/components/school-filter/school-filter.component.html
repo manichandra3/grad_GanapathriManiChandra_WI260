@@ -1,0 +1,72 @@
+<div class="school-filter">
+  <h2>Filter by School</h2>
+
+  <div class="filter-section">
+    <h3>Search by School Name</h3>
+    <div class="search-bar">
+      <input
+        type="text"
+        [(ngModel)]="schoolName"
+        placeholder="Enter school name"
+        (keyup.enter)="searchAndCount()"
+      />
+      <button (click)="searchAndCount()" class="btn btn-primary" [disabled]="!schoolName.trim() || loading">
+        {{ loading ? 'Searching...' : 'Search' }}
+      </button>
+    </div>
+
+    <div *ngIf="error" class="error-message">{{ error }}</div>
+
+    <div *ngIf="schoolCount !== null" class="count-badge">
+      Total students in "{{ schoolName }}": <strong>{{ schoolCount }}</strong>
+    </div>
+
+    <table *ngIf="students.length > 0" class="data-table">
+      <thead>
+        <tr>
+          <th>Reg No</th>
+          <th>Roll No</th>
+          <th>Name</th>
+          <th>Standard</th>
+          <th>Gender</th>
+          <th>Percentage</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let student of students">
+          <td>{{ student.registrationNumber }}</td>
+          <td>{{ student.rollNumber }}</td>
+          <td>{{ student.name }}</td>
+          <td>{{ student.standard }}</td>
+          <td>{{ student.gender }}</td>
+          <td>{{ student.percentage }}%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!loading && students.length === 0 && schoolCount !== null" class="empty-state">
+      No students found in this school.
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <h3>Count by Standard</h3>
+    <div class="search-bar">
+      <input
+        type="number"
+        [(ngModel)]="standardInput"
+        placeholder="Enter standard (1-12)"
+        (keyup.enter)="searchByStandard()"
+      />
+      <button (click)="searchByStandard()" class="btn btn-primary" [disabled]="standardInput === null || standardLoading">
+        {{ standardLoading ? 'Counting...' : 'Get Count' }}
+      </button>
+    </div>
+
+    <div *ngIf="standardError" class="error-message">{{ standardError }}</div>
+
+    <div *ngIf="standardCount !== null" class="count-badge">
+      Students in Standard {{ standardInput }}: <strong>{{ standardCount }}</strong>
+    </div>
+  </div>
+</div>

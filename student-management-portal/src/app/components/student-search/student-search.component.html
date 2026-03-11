@@ -1,0 +1,103 @@
+<div class="student-search">
+  <h2>Search Student</h2>
+
+  <div class="search-bar">
+    <input
+      type="number"
+      [(ngModel)]="searchRegNo"
+      placeholder="Enter Registration Number"
+      (keyup.enter)="searchStudent()"
+    />
+    <button (click)="searchStudent()" class="btn btn-primary" [disabled]="!searchRegNo || loading">
+      {{ loading ? 'Searching...' : 'Search' }}
+    </button>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div *ngIf="student" class="result-card">
+    <h3>Student Found</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Registration Number</label>
+        <span>{{ student.registrationNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Roll Number</label>
+        <span>{{ student.rollNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Name</label>
+        <span>{{ student.name }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Standard</label>
+        <span>{{ student.standard }}</span>
+      </div>
+      <div class="detail-item">
+        <label>School</label>
+        <span>{{ student.school }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Gender</label>
+        <span>{{ student.gender }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Percentage</label>
+        <span>{{ student.percentage }}%</span>
+      </div>
+      <div class="detail-item">
+        <label>Result</label>
+        <span class="status-badge" [class.pass]="student.percentage >= 40" [class.fail]="student.percentage < 40">
+          {{ student.percentage >= 40 ? 'Pass' : 'Fail' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <a [routerLink]="['/students/edit', student.registrationNumber]" class="btn btn-warning">Full Edit</a>
+      <button (click)="togglePatchForm()" class="btn btn-info">
+        {{ showPatchForm ? 'Cancel Patch' : 'Patch Fields' }}
+      </button>
+      <button (click)="deleteStudent()" class="btn btn-danger">Delete</button>
+    </div>
+
+    <div *ngIf="showPatchForm" class="patch-form">
+      <h4>Patch Student Fields</h4>
+      <p class="hint">Fill in only the fields you want to update.</p>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="patchRollNumber">Roll Number</label>
+          <input type="number" id="patchRollNumber" [(ngModel)]="patchFields['rollNumber']" placeholder="New roll number" />
+        </div>
+        <div class="form-group">
+          <label for="patchName">Name</label>
+          <input type="text" id="patchName" [(ngModel)]="patchFields['name']" placeholder="New name" />
+        </div>
+        <div class="form-group">
+          <label for="patchStandard">Standard</label>
+          <input type="number" id="patchStandard" [(ngModel)]="patchFields['standard']" placeholder="1-12" />
+        </div>
+        <div class="form-group">
+          <label for="patchSchool">School</label>
+          <input type="text" id="patchSchool" [(ngModel)]="patchFields['school']" placeholder="New school" />
+        </div>
+        <div class="form-group">
+          <label for="patchGender">Gender</label>
+          <select id="patchGender" [(ngModel)]="patchFields['gender']">
+            <option value="">-- Keep current --</option>
+            <option value="MALE">Male</option>
+            <option value="FEMALE">Female</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="patchPercentage">Percentage</label>
+          <input type="number" id="patchPercentage" [(ngModel)]="patchFields['percentage']" placeholder="0-100" step="0.01" />
+        </div>
+      </div>
+      <button (click)="submitPatch()" class="btn btn-primary">Apply Patch</button>
+    </div>
+  </div>
+</div>

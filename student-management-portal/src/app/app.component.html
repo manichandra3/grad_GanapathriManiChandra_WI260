@@ -1,0 +1,43 @@
+<div class="app-layout">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h1>Student Portal</h1>
+    </div>
+    <ul class="nav-links">
+      <li>
+        <a routerLink="/students" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          All Students
+        </a>
+      </li>
+      <li>
+        <a routerLink="/students/add" routerLinkActive="active">
+          Add Student
+        </a>
+      </li>
+      <li>
+        <a routerLink="/students/search" routerLinkActive="active">
+          Search Student
+        </a>
+      </li>
+      <li>
+        <a routerLink="/school" routerLinkActive="active">
+          By School
+        </a>
+      </li>
+      <li>
+        <a routerLink="/results" routerLinkActive="active">
+          Results
+        </a>
+      </li>
+      <li>
+        <a routerLink="/strength" routerLinkActive="active">
+          Strength
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

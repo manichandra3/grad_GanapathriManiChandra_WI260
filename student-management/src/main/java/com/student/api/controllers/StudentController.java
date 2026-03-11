@@ -2,7 +2,6 @@ package com.student.api.controllers;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -43,7 +42,7 @@ public class StudentController {
     }
 
     @GetMapping("/{regNo}")
-    public ResponseEntity<Optional<Student>> getStudent(@PathVariable int regNo) {
+    public ResponseEntity<Student> getStudent(@PathVariable int regNo) {
         return studentService.getStudent(regNo);
     }
 

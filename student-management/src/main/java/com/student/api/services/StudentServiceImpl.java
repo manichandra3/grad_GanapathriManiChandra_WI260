@@ -25,10 +25,10 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public ResponseEntity<Optional<Student>> getStudent(int registrationNumber) {
+    public ResponseEntity<Student> getStudent(int registrationNumber) {
         Optional<Student> student = studentRepository.findById(registrationNumber);
         if (student.isPresent()) {
-            return ResponseEntity.ok(student);
+            return ResponseEntity.ok(student.get());
         }
         return ResponseEntity.notFound().build();
     }
@@ -59,9 +59,9 @@ public class StudentServiceImpl implements StudentService {
         Student student = existing.get();
         updates.forEach((key, value) -> {
             switch (key) {
-                case "rollNumber" -> student.setRollNumber((int) value);
+                case "rollNumber" -> student.setRollNumber(((Number) value).intValue());
                 case "name" -> student.setName((String) value);
-                case "standard" -> student.setStandard((int) value);
+                case "standard" -> student.setStandard(((Number) value).intValue());
                 case "school" -> student.setSchool((String) value);
                 case "gender" -> student.setGender((String) value);
                 case "percentage" -> student.setPercentage(((Number) value).doubleValue());

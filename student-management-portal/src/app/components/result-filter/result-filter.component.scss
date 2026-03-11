@@ -1,0 +1,54 @@
+.result-filter {
+  h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+  }
+
+  .filter-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-pass {
+    background: #27ae60;
+    color: #fff;
+    border: 2px solid #27ae60;
+
+    &:hover {
+      background: #219a52;
+    }
+  }
+
+  .btn-fail {
+    background: #e74c3c;
+    color: #fff;
+    border: 2px solid #e74c3c;
+
+    &:hover {
+      background: #c0392b;
+    }
+  }
+
+  .results-summary {
+    margin-bottom: 1rem;
+  }
+
+  .count-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+
+    &.pass-bg {
+      background: #d5f5e3;
+      color: #1e8449;
+    }
+
+    &.fail-bg {
+      background: #fadbd8;
+      color: #c0392b;
+    }
+  }
+}
