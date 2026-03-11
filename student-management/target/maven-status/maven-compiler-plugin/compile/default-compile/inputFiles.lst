@@ -1,0 +1,6 @@
+/home/popcorn/dev/student-management/src/main/java/com/student/api/services/StudentService.java
+/home/popcorn/dev/student-management/src/main/java/com/student/api/repository/StudentRepository.java
+/home/popcorn/dev/student-management/src/main/java/com/student/api/models/Student.java
+/home/popcorn/dev/student-management/src/main/java/com/student/api/services/StudentServiceImpl.java
+/home/popcorn/dev/student-management/src/main/java/com/student/api/App.java
+/home/popcorn/dev/student-management/src/main/java/com/student/api/controllers/StudentController.java
